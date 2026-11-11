@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prototipo interactivo · Marketing OS · ExtremeTech Costa Rica</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface-2: #f0f2f5;
+    --text: #14161b;
+    --muted: #596070;
+    --red: #d7141a;
+    --red-dark: #a80f14;
+    --ink: #101217;
+    --border: #e2e5eb;
+    --shadow: 0 1px 2px rgba(16,18,23,.06), 0 8px 24px rgba(16,18,23,.06);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e0f13;
+      --surface: #181a20;
+      --surface-2: #20232b;
+      --text: #eceef3;
+      --muted: #a4abba;
+      --red: #ff3b41;
+      --red-dark: #ff5a5f;
+      --ink: #08090c;
+      --border: #2b2f3a;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e0f13;
+    --surface: #181a20;
+    --surface-2: #20232b;
+    --text: #eceef3;
+    --muted: #a4abba;
+    --red: #ff3b41;
+    --red-dark: #ff5a5f;
+    --ink: #08090c;
+    --border: #2b2f3a;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  html { scroll-behavior: smooth; scroll-padding-top: 5rem; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  img { max-width: 100%; height: auto; display: block; }
+  a { color: var(--red); }
+
+  /* ---------- Header ---------- */
+  .site-header {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 20;
+    background: var(--ink);
+    color: #fff;
+    border-bottom: 3px solid var(--red);
+  }
+  .site-header .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: .6rem 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: .9rem; }
+  .brand .logo-et { height: 38px; width: auto; background: #fff; border-radius: 6px; padding: 3px 6px; }
+  .brand .logo-sf { height: 40px; width: auto; background: #fff; border-radius: 6px; padding: 2px 4px; }
+  .brand .sep { width: 1px; height: 30px; background: rgba(255,255,255,.25); }
+  .brand .title { font-size: .85rem; line-height: 1.2; color: #c9ced9; }
+  nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 1.1rem; overflow-x: auto; scrollbar-width: none; }
+  nav ul::-webkit-scrollbar { display: none; }
+  nav a {
+    color: #d6dae3;
+    text-decoration: none;
+    font-size: .9rem;
+    white-space: nowrap;
+    padding: .25rem 0;
+    border-bottom: 2px solid transparent;
+  }
+  nav a:hover, nav a:focus-visible { color: #fff; border-bottom-color: var(--red); outline: none; }
+
+  /* ---------- Layout ---------- */
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 1.25rem; }
+  main { padding-bottom: 3rem; }
+  section { padding: 4.5rem 0 1rem; scroll-margin-top: 5rem; }
+  .eyebrow {
+    display: inline-block;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: .6rem;
+  }
+  h1 { font-size: clamp(2rem, 4.2vw, 3.2rem); line-height: 1.12; margin: 0 0 1rem; letter-spacing: -.02em; }
+  h2 { font-size: clamp(1.6rem, 2.8vw, 2.1rem); line-height: 1.2; margin: 0 0 .6rem; letter-spacing: -.01em; }
+  h3 { font-size: 1.12rem; margin: 0 0 .5rem; line-height: 1.35; }
+  p { margin: 0 0 1rem; }
+  .lead { font-size: 1.08rem; color: var(--muted); max-width: 70ch; }
+  .section-head { margin-bottom: 2rem; }
+  .section-head .num { color: var(--muted); font-weight: 600; font-size: .9rem; margin-right: .5rem; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    background:
+      radial-gradient(900px 400px at 85% -10%, rgba(215,20,26,.35), transparent 60%),
+      linear-gradient(135deg, #0c0d11 0%, #17191f 55%, #2a0d10 100%);
+    color: #f3f4f7;
+    padding: 4rem 0 0;
+    border-bottom: 0;
+  }
+  .hero .eyebrow { color: #ff5a5f; }
+  .hero .lead { color: #c3c9d6; }
+  .hero-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 2.5rem; align-items: center; }
+  .hero-photo { border-radius: 18px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.08); }
+  .hero-photo img { width: 100%; height: auto; }
+  .chips { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.5rem 0 0; }
+  .chip {
+    background: rgba(255,255,255,.08);
+    border: 1px solid rgba(255,255,255,.14);
+    color: #eef0f5;
+    border-radius: 999px;
+    padding: .3rem .85rem;
+    font-size: .85rem;
+  }
+  .team-strip {
+    margin-top: 3.5rem;
+    background: rgba(255,255,255,.04);
+    border-top: 1px solid rgba(255,255,255,.1);
+    padding: 1.4rem 0;
+  }
+  .team-strip .wrap { display: flex; flex-wrap: wrap; gap: 1.5rem 2.5rem; align-items: center; justify-content: space-between; }
+  .team-strip .label { font-size: .78rem; text-transform: uppercase; letter-spacing: .12em; color: #9aa3b5; font-weight: 700; }
+  .team-names { display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; }
+  .team-names span { color: #f3f4f7; font-weight: 500; font-size: .95rem; }
+
+  /* ---------- Cards & components ---------- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.6rem 1.6rem;
+    box-shadow: var(--shadow);
+  }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1.25rem; }
+  .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; }
+  .stack { display: flex; flex-direction: column; gap: 1.25rem; }
+  .gap-top { margin-top: 1.25rem; }
+
+  .icon {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    background: rgba(215,20,26,.1);
+    color: var(--red);
+    display: grid; place-items: center;
+    margin-bottom: 1rem;
+  }
+  .icon svg { width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  .stat { text-align: left; }
+  .stat .value { font-size: 2.2rem; font-weight: 800; letter-spacing: -.02em; color: var(--text); line-height: 1; }
+  .stat .value small { font-size: 1rem; color: var(--red); font-weight: 700; margin-left: .15rem; }
+  .stat .label { color: var(--muted); font-size: .9rem; margin-top: .45rem; }
+
+  .stat-band {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin: 2rem 0 0;
+  }
+  .stat-band > div { background: var(--surface); padding: 1.4rem 1.5rem; }
+
+  .table-simple { width: 100%; border-collapse: collapse; }
+  .table-simple th, .table-simple td { text-align: left; vertical-align: top; padding: .75rem .25rem; border-bottom: 1px solid var(--border); font-size: .95rem; }
+  .table-simple tr:last-child th, .table-simple tr:last-child td { border-bottom: 0; }
+  .table-simple th { width: 36%; color: var(--muted); font-weight: 600; padding-right: 1rem; }
+
+  ul.check { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
+  ul.check li { display: flex; gap: .65rem; align-items: flex-start; }
+  ul.check li::before {
+    content: "";
+    flex: 0 0 18px;
+    height: 18px;
+    margin-top: .3rem;
+    background: var(--red);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12l4 4 10-10' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12l4 4 10-10' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+  }
+
+  ol.steps { list-style: none; counter-reset: s; margin: 0; padding: 0; display: grid; gap: .9rem; }
+  ol.steps li { counter-increment: s; display: grid; grid-template-columns: 2.2rem 1fr; gap: .9rem; align-items: start; }
+  ol.steps li::before {
+    content: counter(s);
+    width: 2.2rem; height: 2.2rem;
+    border-radius: 50%;
+    background: var(--ink);
+    color: #fff;
+    font-weight: 700;
+    display: grid; place-items: center;
+    font-size: .95rem;
+  }
+
+  .callout {
+    border-radius: 16px;
+    padding: 1.4rem 1.6rem;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--red);
+  }
+  .callout strong { color: var(--text); }
+  .pending {
+    border: 1px dashed var(--muted);
+    border-radius: 14px;
+    padding: 1.1rem 1.3rem;
+    color: var(--muted);
+    background: transparent;
+    font-size: .95rem;
+  }
+
+  figure { margin: 0; }
+  figure img { border-radius: 16px; border: 1px solid var(--border); }
+  figcaption { color: var(--muted); font-size: .88rem; margin-top: .6rem; }
+
+  .photo-band {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .photo-band img { width: 100%; height: auto; }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: center; }
+  .split.reverse > :first-child { order: 2; }
+
+  /* ---------- Team ---------- */
+  .person { display: flex; gap: 1rem; align-items: flex-start; }
+  .avatar {
+    flex: 0 0 52px; height: 52px; border-radius: 14px;
+    background: var(--ink); color: #fff;
+    display: grid; place-items: center;
+    font-weight: 800; letter-spacing: .02em;
+  }
+  .person h3 { margin-bottom: .15rem; }
+  .person .role { color: var(--red); font-size: .85rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-bottom: .35rem; }
+  .person p { color: var(--muted); font-size: .94rem; margin: 0; }
+
+  /* ---------- Timeline ---------- */
+  .timeline { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; position: relative; }
+  .phase { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.2rem 1.2rem 1.3rem; box-shadow: var(--shadow); border-top: 4px solid var(--red); }
+  .phase .wk { font-weight: 800; color: var(--text); font-size: 1.05rem; }
+  .phase p { color: var(--muted); font-size: .93rem; margin: .4rem 0 0; }
+
+  /* ---------- Mockup frame ---------- */
+  .browser {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    box-shadow: 0 20px 50px rgba(16,18,23,.15);
+  }
+  .browser-bar { background: var(--surface-2); padding: .6rem .9rem; display: flex; align-items: center; gap: .45rem; border-bottom: 1px solid var(--border); }
+  .browser-bar i { width: 10px; height: 10px; border-radius: 50%; background: #c9ced9; display: block; }
+  .browser-bar i:first-child { background: var(--red); }
+  .browser-bar .url { margin-left: .8rem; font-size: .8rem; color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: .15rem .7rem; flex: 1; max-width: 360px; }
+  .browser img { width: 100%; height: auto; }
+
+  /* ---------- Refs ---------- */
+  .refs p { padding-left: 2.2em; text-indent: -2.2em; margin-bottom: .9rem; font-size: .95rem; overflow-wrap: anywhere; }
+
+  footer.site-footer { background: var(--ink); color: #aab1bf; padding: 2.5rem 0; margin-top: 4rem; font-size: .9rem; }
+  footer.site-footer .wrap { display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: center; justify-content: space-between; }
+  footer.site-footer img { height: 34px; width: auto; background: #fff; border-radius: 6px; padding: 3px 6px; }
+  footer.site-footer .fl { display: flex; align-items: center; gap: 1rem; }
+
+
+  /* ---------- División de secciones y nombre del proyecto ---------- */
+  .project-band {
+    background: linear-gradient(120deg, #e4191f 0%, #b10f14 55%, #6e0a0d 100%);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 20px;
+    padding: 1.4rem 1.6rem 1.5rem;
+    box-shadow: 0 24px 48px rgba(215,20,26,.28), inset 0 1px 0 rgba(255,255,255,.2);
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .project-band::before {
+    content: ""; position: absolute; right: -60px; top: -60px; width: 220px; height: 220px;
+    border-radius: 50%; background: rgba(255,255,255,.08);
+  }
+  .project-kicker { display: inline-block; margin: 0 0 .4rem; font-size: .8rem; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.85); position: relative; }
+  .project-name {
+    font-size: clamp(3.4rem, 9vw, 6rem); font-weight: 900; line-height: 1; letter-spacing: -.035em;
+    margin: 0; color: #fff; position: relative; text-shadow: 0 4px 18px rgba(0,0,0,.25);
+  }
+  .project-title { font-size: clamp(1.2rem, 2.2vw, 1.55rem); font-weight: 600; color: #e6e9f1; line-height: 1.35; margin: 1.6rem 0 .4rem; max-width: 32ch; }
+  section { border-top: 1px solid var(--border); }
+  #resumen { border-top: 0; }
+  #organizacion, #propuesta, #evidencias, #referencias { background: var(--surface-2); border-top-color: transparent; }
+  #organizacion, #propuesta, #evidencias, #referencias { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  section .section-head .eyebrow { border-left: 3px solid var(--red); padding-left: .6rem; }
+  nav a[aria-current="true"] { color: #fff; border-bottom-color: var(--red); }
+
+  /* ---------- Menú en recuadros ---------- */
+  nav a {
+    border: 1px solid rgba(255,255,255,.28);
+    border-radius: 8px;
+    background: rgba(255,255,255,.06);
+    padding: .4rem .85rem;
+    color: #eef0f5;
+    font-weight: 600;
+    transition: background .2s, border-color .2s;
+  }
+  nav a:hover, nav a:focus-visible { background: rgba(255,255,255,.14); border-color: #fff; border-bottom-color: #fff; }
+  nav a[aria-current="true"] { background: var(--red); border-color: var(--red); color: #fff; }
+  nav ul { gap: .6rem; }
+
+  @media (max-width: 900px) {
+    .hero-grid, .split { grid-template-columns: 1fr; }
+    .split.reverse > :first-child { order: 0; }
+  }
+  @media (max-width: 640px) {
+    section { padding: 3.2rem 0 .5rem; }
+    .site-header .wrap { padding: .55rem 1rem; }
+    .brand .title { display: none; }
+    .card { padding: 1.25rem; }
+    .hero { padding-top: 2.5rem; }
+  }
+
+  /* ---------- Prototipo interactivo ---------- */
+  .app {
+    --a-bg: #0d0e12; --a-panel: #161820; --a-panel-2: #1d2029; --a-line: #2a2e3a;
+    --a-text: #e9ebf1; --a-muted: #9298a8; --a-red: #ff3b41; --a-green: #3ddc97; --a-amber: #ffb547;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    background: var(--a-bg);
+    color: var(--a-text);
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--a-line);
+    box-shadow: 0 30px 60px rgba(0,0,0,.25);
+    min-height: 620px;
+    font-size: 14px;
+    text-align: left;
+  }
+  .app * { box-sizing: border-box; }
+  .app-side { background: #101218; border-right: 1px solid var(--a-line); padding: 18px 12px; display: flex; flex-direction: column; gap: 4px; }
+  .app-brand { display: flex; align-items: center; gap: 10px; padding: 4px 8px 16px; font-weight: 800; font-size: 15px; line-height: 1.1; }
+  .app-brand small { display: block; font-weight: 500; color: var(--a-muted); font-size: 11px; }
+  .app-brand .x { width: 34px; height: 34px; border-radius: 9px; background: var(--a-red); color: #fff; display: grid; place-items: center; font-weight: 900; }
+  .app-nav-label { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #5f6575; padding: 14px 10px 6px; font-weight: 700; }
+  .nav-btn {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    background: transparent; border: 0; color: var(--a-muted);
+    padding: 9px 10px; border-radius: 9px; cursor: pointer;
+    font: inherit; font-size: 14px; text-align: left;
+  }
+  .nav-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 18px; }
+  .nav-btn:hover { background: var(--a-panel-2); color: var(--a-text); }
+  .nav-btn.is-on { background: rgba(255,59,65,.14); color: #ff7a7f; box-shadow: inset 3px 0 0 var(--a-red); }
+  .nav-btn:focus-visible { outline: 2px solid var(--a-red); outline-offset: 2px; }
+  .app-foot { margin-top: auto; font-size: 11px; color: #5f6575; padding: 12px 8px 0; line-height: 1.4; }
+
+  .app-main { min-width: 0; display: flex; flex-direction: column; }
+  .app-top {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 12px 22px; border-bottom: 1px solid var(--a-line); background: var(--a-panel);
+    font-size: 12px; color: var(--a-muted);
+  }
+  .live { color: var(--a-green); font-weight: 700; }
+  .topstats .bad { color: #ff7a7f; font-weight: 700; }
+  .topstats .good { color: var(--a-green); font-weight: 700; }
+  .view-wrap { padding: 20px 22px 26px; }
+  .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 14px; }
+  .kpi { background: var(--a-panel); border: 1px solid var(--a-line); border-radius: 12px; padding: 14px 16px; }
+  .kpi-l { font-size: 12px; color: var(--a-muted); }
+  .kpi-v { font-size: 22px; font-weight: 800; margin: 4px 0 2px; letter-spacing: -.01em; }
+  .kpi-s { font-size: 11px; color: #6f7587; }
+  .kpi-v.good { color: var(--a-green); }
+  .kpi-v.bad { color: #ff7a7f; }
+
+  .alert, .ok {
+    border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; font-size: 13px;
+  }
+  .alert { background: rgba(255,59,65,.12); border: 1px solid rgba(255,59,65,.35); color: #ffb3b6; }
+  .ok { background: rgba(61,220,151,.1); border: 1px solid rgba(61,220,151,.3); color: #b6f2d6; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .panel { background: var(--a-panel); border: 1px solid var(--a-line); border-radius: 12px; padding: 14px 16px; min-width: 0; }
+  .panel-h { font-weight: 700; margin-bottom: 12px; font-size: 13px; }
+
+  .chart { display: flex; align-items: flex-end; gap: 10px; height: 170px; padding-top: 6px; }
+  .bar-col { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px; }
+  .bar { width: 100%; max-width: 46px; background: linear-gradient(180deg, #ff5a5f, #a80f14); border-radius: 6px 6px 2px 2px; position: relative; min-height: 4px; }
+  .bar span { position: absolute; top: -18px; left: 0; right: 0; text-align: center; font-size: 11px; color: var(--a-muted); }
+  .bar-l { font-size: 11px; color: var(--a-muted); }
+
+  .row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--a-line); }
+  .row:last-child { border-bottom: 0; }
+  .row small { display: block; color: var(--a-muted); font-size: 12px; }
+  .score { display: inline-block; min-width: 34px; text-align: center; font-weight: 800; color: var(--a-green); background: rgba(61,220,151,.1); border-radius: 8px; padding: 3px 6px; }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; align-items: center; }
+  .toolbar .inp { flex: 1 1 200px; }
+  .inp {
+    background: var(--a-panel-2); border: 1px solid var(--a-line); color: var(--a-text);
+    border-radius: 9px; padding: 9px 11px; font: inherit; font-size: 13px; min-width: 0; width: 100%;
+  }
+  .inp:focus { outline: 2px solid rgba(255,59,65,.5); outline-offset: 1px; }
+  .sel { width: auto; max-width: 100%; }
+  .sel.sm { padding: 6px 8px; font-size: 12px; }
+  .btn {
+    background: var(--a-red); color: #fff; border: 0; border-radius: 9px; padding: 9px 14px;
+    font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn-ghost {
+    background: transparent; border: 1px solid var(--a-line); color: var(--a-text); border-radius: 8px;
+    padding: 6px 10px; font: inherit; font-size: 12px; cursor: pointer; white-space: nowrap;
+  }
+  .btn-ghost:hover { border-color: #4a5063; }
+  .btn-ghost.danger { color: #ff9ba0; }
+  .btn:focus-visible, .btn-ghost:focus-visible { outline: 2px solid var(--a-red); outline-offset: 2px; }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--a-line); border-radius: 12px; background: var(--a-panel); }
+  table.dt { width: 100%; border-collapse: collapse; min-width: 640px; }
+  table.dt th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--a-muted); padding: 11px 12px; border-bottom: 1px solid var(--a-line); background: var(--a-panel-2); font-weight: 700; }
+  table.dt td { padding: 11px 12px; border-bottom: 1px solid var(--a-line); vertical-align: middle; font-size: 13px; }
+  table.dt tr:last-child td { border-bottom: 0; }
+  table.dt td small { display: block; color: var(--a-muted); font-size: 11px; margin-top: 2px; }
+  table.dt td.acts { white-space: nowrap; text-align: right; }
+  .bad { color: #ff7a7f; font-weight: 700; }
+  .good { color: var(--a-green); font-weight: 700; }
+  .muted { color: var(--a-muted); }
+  .empty { padding: 30px; text-align: center; color: var(--a-muted); border: 1px dashed var(--a-line); border-radius: 12px; }
+
+  .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px; border: 1px solid transparent; white-space: nowrap; }
+  .tag-activa { background: rgba(61,220,151,.12); color: var(--a-green); border-color: rgba(61,220,151,.3); }
+  .tag-pausada { background: rgba(255,181,71,.12); color: var(--a-amber); border-color: rgba(255,181,71,.3); }
+  .tag-finalizada { background: rgba(146,152,168,.12); color: #b3b9c8; border-color: rgba(146,152,168,.3); }
+
+  .bar-h { height: 6px; background: var(--a-panel-2); border-radius: 99px; margin-top: 6px; overflow: hidden; min-width: 120px; }
+  .bar-h i { display: block; height: 100%; background: var(--a-red); border-radius: 99px; }
+
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .pill-count { background: var(--a-panel); border: 1px solid var(--a-line); border-radius: 999px; padding: 5px 12px; font-size: 12px; color: var(--a-muted); }
+  .pill-count b { color: var(--a-text); margin-left: 4px; }
+  .hint { font-size: 12px; color: var(--a-muted); margin: 0 0 12px; }
+
+  .hb { display: grid; grid-template-columns: 110px 1fr 90px; gap: 10px; align-items: center; margin-bottom: 10px; font-size: 13px; }
+  .hb b { text-align: right; font-weight: 700; }
+  .hb-bar { height: 10px; background: var(--a-panel-2); border-radius: 99px; overflow: hidden; }
+  .hb-bar i { display: block; height: 100%; background: linear-gradient(90deg, #a80f14, #ff3b41); border-radius: 99px; }
+
+  .roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .role-card {
+    text-align: left; background: var(--a-panel); border: 1px solid var(--a-line); border-radius: 12px;
+    padding: 14px; color: var(--a-text); cursor: pointer; font: inherit; display: grid; gap: 6px;
+  }
+  .role-card small { color: var(--a-muted); font-size: 12px; }
+  .role-card.is-on { border-color: var(--a-red); box-shadow: 0 0 0 1px var(--a-red) inset; }
+  .perms { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 13px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 140%);
+    background: #22c58a; color: #06231a; font-weight: 700; padding: 12px 18px; border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.35); transition: transform .25s ease; z-index: 60;
+    max-width: calc(100vw - 32px); font-size: 14px;
+  }
+  .toast.show { transform: translate(-50%, 0); }
+  .toast.bad { background: #ff3b41; color: #fff; }
+
+  .modal-back { position: fixed; inset: 0; background: rgba(5,6,9,.66); display: grid; place-items: center; z-index: 50; padding: 16px; }
+  .modal-back[hidden] { display: none; }
+  .modal {
+    background: var(--a-panel); color: var(--a-text); border: 1px solid var(--a-line); border-radius: 16px;
+    width: min(560px, 100%); max-height: calc(100vh - 32px); overflow: auto; padding: 22px; box-shadow: 0 30px 60px rgba(0,0,0,.5);
+    text-align: left;
+  }
+  .modal h3 { margin: 0 0 14px; font-size: 18px; }
+  .modal label { display: grid; gap: 6px; font-size: 12px; color: var(--a-muted); margin-bottom: 12px; font-weight: 600; }
+  .modal label.chk { display: flex; align-items: flex-start; gap: 8px; color: var(--a-text); font-weight: 500; font-size: 13px; }
+  .modal label.chk input { margin-top: 3px; accent-color: var(--a-red); }
+  .modal .inp { color: var(--a-text); font-weight: 400; }
+  .modal .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal .promo { border: 1px dashed #3a4050; border-radius: 12px; padding: 12px 14px 4px; margin: 4px 0 12px; }
+  .modal .promo legend { font-size: 12px; color: #ffb3b6; padding: 0 6px; font-weight: 700; }
+  .modal .errs { background: rgba(255,59,65,.12); border: 1px solid rgba(255,59,65,.4); color: #ffc2c4; border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; font-size: 13px; }
+  .modal .errs ul { margin: 6px 0 0; padding-left: 18px; }
+  .modal .errs[hidden] { display: none; }
+  .modal .actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }
+  .modal .actions .btn-ghost { padding: 9px 14px; font-size: 13px; }
+
+  .note-small { font-size: 12px; color: var(--muted); margin: 12px 0 0; }
+
+  @media (max-width: 860px) {
+    .app { grid-template-columns: 1fr; }
+    .app-side { flex-direction: row; overflow-x: auto; align-items: center; padding: 10px; gap: 6px; border-right: 0; border-bottom: 1px solid var(--a-line); }
+    .app-brand { padding: 0 8px 0 0; flex: 0 0 auto; }
+    .app-nav-label, .app-foot { display: none; }
+    .nav-btn { width: auto; white-space: nowrap; flex: 0 0 auto; }
+    .nav-btn.is-on { box-shadow: inset 0 -3px 0 var(--a-red); }
+    .grid2 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .modal .row2 { grid-template-columns: 1fr; }
+    .view-wrap { padding: 14px; }
+    .hb { grid-template-columns: 90px 1fr 70px; }
+  }
+
+  :root { --a-bg:#0d0e12; --a-panel:#161820; --a-panel-2:#1d2029; --a-line:#2a2e3a; --a-text:#e9ebf1; --a-muted:#9298a8; --a-red:#ff3b41; --a-green:#3ddc97; --a-amber:#ffb547; }
+</style>
+</head>
+<body>
+<main>
+<section id="mockups">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow"><span class="num">05</span>Mockups o prototipo</span>
+      <h2>Prototipo navegable del sistema</h2>
+      <p class="lead">Recorra el prototipo: cree campañas con validación de promociones, registre prospectos, cambie su estado y revise los reportes. Los datos son de ejemplo.</p>
+    </div>
+
+    <div class="app" id="app" aria-label="Prototipo interactivo de la plataforma de Mercadeo">
+      <aside class="app-side">
+        <div class="app-brand"><span class="x">X</span><div>Marketing OS<small>ExtremeTech CR</small></div></div>
+        <div class="app-nav-label">Panel</div>
+        <button class="nav-btn is-on" data-nav="dashboard"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</button>
+        <div class="app-nav-label">Módulos</div>
+        <button class="nav-btn" data-nav="campanas"><svg viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 001 1h3l5 4V6L7 10H4a1 1 0 00-1 1zM16 9a4 4 0 010 6"/></svg>Campañas</button>
+        <button class="nav-btn" data-nav="crm"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6M17 11l2 2 4-4"/></svg>Mini-CRM</button>
+        <button class="nav-btn" data-nav="reportes"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M7 16v-5M12 16V8M17 16v-9"/></svg>Reportería</button>
+        <div class="app-nav-label">Sistema</div>
+        <button class="nav-btn" data-nav="usuarios"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>Usuarios y accesos</button>
+        <div class="app-foot">Proyecto Integrador · II Ciclo 2026</div>
+      </aside>
+
+      <div class="app-main">
+        <div class="app-top">
+          <span class="live">● En vivo</span>
+          <span id="app-topstats" class="topstats"></span>
+        </div>
+        <div id="view" class="view-wrap"></div>
+      </div>
+    </div>
+
+    <div class="modal-back" id="modal-back" hidden>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" id="modal"></div>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <p class="note-small">Prototipo funcional sin conexión a base de datos: los cambios viven en la sesión del navegador y se reinician al recargar.</p>
+  </div>
+</section>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Utilidades ---------- */
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var fmt = function (n) { return "₡" + Math.round(n || 0).toLocaleString("es-CR"); };
+  var esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+  var MIN = 60000;
+  var minutesAgo = function (ts) { return Math.max(0, Math.round((Date.now() - ts) / MIN)); };
+  var since = function (ts) {
+    var m = minutesAgo(ts);
+    if (m < 60) return m + " min";
+    var h = Math.floor(m / 60);
+    if (h < 24) return h + " h";
+    return Math.floor(h / 24) + " d";
+  };
+  var roi = function (c) { return c.ejecutado > 0 ? (c.valor - c.ejecutado) / c.ejecutado : 0; };
+  var pctTxt = function (v) { return (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%"; };
+
+  var CANALES = ["Multicanal", "Meta Ads", "Google Ads", "Instagram", "Email", "WhatsApp", "Tienda física"];
+  var ESTADO_LEAD = ["Nuevo", "Contactado", "Calificado", "Convertido", "Descartado"];
+  var ESTADO_CAMP = ["Activa", "Pausada", "Finalizada"];
+
+  /* ---------- Datos de ejemplo (basados en el mockup) ---------- */
+  var now = Date.now();
+  var S = {
+    view: "dashboard",
+    campanas: [
+      { id: "CMP-2026-001", nombre: "Feria Tecnológica San José", canal: "Multicanal", asignado: 3500000, ejecutado: 3500000, valor: 0, estado: "Finalizada", tipo: "Publicidad", inicio: "2026-10-20", fin: "2026-10-31" },
+      { id: "CMP-2026-002", nombre: "Black Friday Gamer", canal: "Meta Ads", asignado: 4000000, ejecutado: 3200000, valor: 2100000, estado: "Activa", tipo: "Promoción", inicio: "2026-11-01", fin: "2026-11-30", precio: 99000, cantidad: 120, restricciones: "Válido en tienda y en línea", stock: true },
+      { id: "CMP-2026-003", nombre: "Regreso a Clases — Laptops", canal: "Instagram", asignado: 2100000, ejecutado: 2100000, valor: 1400000, estado: "Pausada", tipo: "Promoción", inicio: "2026-08-01", fin: "2026-08-31", precio: 399000, cantidad: 15, restricciones: "Hasta agotar existencias", stock: true },
+      { id: "CMP-2026-004", nombre: "Lanzamiento PC Gaming Ryzen", canal: "Google Ads", asignado: 3000000, ejecutado: 1800000, valor: 2700000, estado: "Activa", tipo: "Publicidad", inicio: "2026-11-05", fin: "2026-12-05" },
+      { id: "CMP-2026-005", nombre: "Retargeting Carrito Abandonado", canal: "Email", asignado: 500000, ejecutado: 400000, valor: 520000, estado: "Activa", tipo: "Publicidad", inicio: "2026-10-15", fin: "2026-11-30" }
+    ],
+    leads: [
+      { id: "L-01", nombre: "Mariana Rojas", correo: "mariana.rojas@gmail.com", camp: "CMP-2026-002", puntaje: 92, estado: "Contactado", creado: now - 25 * MIN, consentimiento: true },
+      { id: "L-02", nombre: "Josué Salas", correo: "josue.salas88@gmail.com", camp: "CMP-2026-004", puntaje: 87, estado: "Nuevo", creado: now - 75 * MIN, consentimiento: true },
+      { id: "L-03", nombre: "Karla Araya", correo: "karla.araya@hotmail.com", camp: "CMP-2026-005", puntaje: 61, estado: "Calificado", creado: now - 240 * MIN, consentimiento: true },
+      { id: "L-04", nombre: "Diego Vargas", correo: "dvargas.tech@gmail.com", camp: "CMP-2026-004", puntaje: 54, estado: "Nuevo", creado: now - 20 * MIN, consentimiento: true },
+      { id: "L-05", nombre: "Sofía Chinchilla", correo: "sofia.chinchilla@yahoo.com", camp: "CMP-2026-004", puntaje: 38, estado: "Contactado", creado: now - 300 * MIN, consentimiento: true },
+      { id: "L-06", nombre: "Esteban Mora", correo: "emora.cr@gmail.com", camp: "CMP-2026-002", puntaje: 95, estado: "Convertido", creado: now - 1440 * MIN, consentimiento: true },
+      { id: "L-07", nombre: "Paola Jiménez", correo: "paola.j@outlook.com", camp: "CMP-2026-003", puntaje: 28, estado: "Descartado", creado: now - 1800 * MIN, consentimiento: true }
+    ],
+    f: { cq: "", ce: "Todos", lq: "", le: "Todos" },
+    confirm: null
+  };
+
+  var campById = function (id) { for (var i = 0; i < S.campanas.length; i++) if (S.campanas[i].id === id) return S.campanas[i]; return null; };
+  var leadsOf = function (c) { return S.leads.filter(function (l) { return l.camp === c.id; }); };
+  var sinAtender = function () { return S.leads.filter(function (l) { return l.estado === "Nuevo" && minutesAgo(l.creado) > 60; }); };
+
+  /* ---------- Render de vistas ---------- */
+  var view = $("#view");
+  var topstats = $("#app-topstats");
+
+  function renderTop() {
+    var activas = S.campanas.filter(function (c) { return c.estado === "Activa"; }).length;
+    topstats.innerHTML =
+      activas + " campañas activas · " + S.leads.length + " leads · " +
+      '<span class="' + (sinAtender().length ? "bad" : "good") + '">' + sinAtender().length + " sin atender &gt; 1 h</span>";
+  }
+
+  function kpi(label, value, sub, cls) {
+    return '<div class="kpi"><div class="kpi-l">' + label + '</div><div class="kpi-v ' + (cls || "") + '">' + value + '</div><div class="kpi-s">' + sub + "</div></div>";
+  }
+
+  function viewDashboard() {
+    var asignado = S.campanas.reduce(function (a, c) { return a + c.asignado; }, 0);
+    var ejec = S.campanas.reduce(function (a, c) { return a + c.ejecutado; }, 0);
+    var val = S.campanas.reduce(function (a, c) { return a + c.valor; }, 0);
+    var activas = S.campanas.filter(function (c) { return c.estado === "Activa"; }).length;
+    var roiT = ejec > 0 ? (val - ejec) / ejec : 0;
+    var dias = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+    var leads7 = [31, 48, 44, 27, 39, 52, 36];
+    var max = Math.max.apply(null, leads7);
+    var bars = leads7.map(function (v, i) {
+      return '<div class="bar-col"><div class="bar" style="height:' + Math.round(v / max * 100) + '%"><span>' + v + '</span></div><div class="bar-l">' + dias[i] + "</div></div>";
+    }).join("");
+    var alerta = sinAtender().length
+      ? '<div class="alert">⚠ ' + sinAtender().length + " prospecto(s) llevan más de 1 hora sin respuesta. Atiéndalos desde el Mini-CRM.</div>"
+      : '<div class="ok">✓ Todos los prospectos nuevos fueron atendidos en menos de 1 hora.</div>';
+    var recientes = S.leads.slice().sort(function (a, b) { return b.creado - a.creado; }).slice(0, 5).map(function (l) {
+      var c = campById(l.camp);
+      return '<div class="row"><div><strong>' + esc(l.nombre) + '</strong><small>' + esc(c ? c.nombre : "") + '</small></div><span class="score">' + l.puntaje + "</span></div>";
+    }).join("");
+    return (
+      '<h3 class="vh">Panel general</h3>' +
+      '<div class="kpis">' +
+      kpi("Presupuesto asignado", fmt(asignado), fmt(ejec) + " ejecutado") +
+      kpi("Campañas activas", activas + " / " + S.campanas.length, "Este ciclo") +
+      kpi("Leads captados", S.leads.length, "Últimos 7 días") +
+      kpi("ROI estimado", pctTxt(roiT), "Valor generado vs. inversión", roiT >= 0 ? "good" : "bad") +
+      "</div>" + alerta +
+      '<div class="grid2">' +
+      '<div class="panel"><div class="panel-h">Leads captados · últimos 7 días</div><div class="chart">' + bars + "</div></div>" +
+      '<div class="panel"><div class="panel-h">Mini-CRM · leads recientes</div>' + recientes + "</div>" +
+      "</div>"
+    );
+  }
+
+  function campRowHtml(c) {
+    var p = c.asignado > 0 ? Math.min(100, Math.round(c.ejecutado / c.asignado * 100)) : 0;
+    var del = S.confirm === "del-" + c.id ? "¿Confirmar?" : "Eliminar";
+    return (
+      "<tr>" +
+      "<td><strong>" + esc(c.nombre) + "</strong><small>" + c.id + " · " + esc(c.tipo) + "</small></td>" +
+      "<td>" + esc(c.canal) + "</td>" +
+      "<td>" + fmt(c.ejecutado) + " / " + fmt(c.asignado) +
+      '<div class="bar-h"><i style="width:' + p + '%"></i></div></td>' +
+      "<td>" + leadsOf(c).length + "</td>" +
+      '<td><span class="tag tag-' + c.estado.toLowerCase() + '">' + c.estado + "</span></td>" +
+      '<td class="acts"><button class="btn-ghost" data-act="toggle" data-id="' + c.id + '">' + (c.estado === "Activa" ? "Pausar" : c.estado === "Pausada" ? "Reanudar" : "—") + "</button>" +
+      '<button class="btn-ghost danger" data-act="del" data-id="' + c.id + '">' + del + "</button></td>" +
+      "</tr>"
+    );
+  }
+
+  function campTableHtml() {
+    var q = S.f.cq.toLowerCase();
+    var rows = S.campanas.filter(function (c) {
+      return (!q || (c.nombre + " " + c.id + " " + c.canal).toLowerCase().indexOf(q) >= 0) &&
+             (S.f.ce === "Todos" || c.estado === S.f.ce);
+    });
+    if (!rows.length) return '<div class="empty">No hay campañas que coincidan con el filtro.</div>';
+    return '<div class="table-wrap"><table class="dt"><thead><tr><th>Campaña</th><th>Canal</th><th>Presupuesto</th><th>Leads</th><th>Estado</th><th></th></tr></thead><tbody>' +
+      rows.map(campRowHtml).join("") + "</tbody></table></div>";
+  }
+
+  function viewCampanas() {
+    return (
+      '<div class="toolbar"><input class="inp" id="f-cq" placeholder="Buscar campaña, canal o código" value="' + esc(S.f.cq) + '">' +
+      '<select class="inp sel" id="f-ce"><option>Todos</option>' +
+      ESTADO_CAMP.map(function (e) { return "<option" + (S.f.ce === e ? " selected" : "") + ">" + e + "</option>"; }).join("") +
+      '</select><button class="btn" data-act="new-camp">+ Nueva campaña</button></div>' +
+      '<div id="camp-table">' + campTableHtml() + "</div>"
+    );
+  }
+
+  function leadRowHtml(l) {
+    var c = campById(l.camp);
+    var espera = l.estado === "Nuevo"
+      ? '<span class="' + (minutesAgo(l.creado) > 60 ? "bad" : "") + '">' + since(l.creado) + "</span>"
+      : '<span class="muted">Atendido</span>';
+    return (
+      "<tr>" +
+      "<td><strong>" + esc(l.nombre) + "</strong><small>" + esc(l.correo) + "</small></td>" +
+      "<td>" + esc(c ? c.nombre : "—") + "</td>" +
+      '<td><span class="score">' + l.puntaje + "</span></td>" +
+      "<td>" + espera + "</td>" +
+      '<td><select class="inp sel sm" data-change="stage" data-id="' + l.id + '">' +
+      ESTADO_LEAD.map(function (e) { return "<option" + (l.estado === e ? " selected" : "") + ">" + e + "</option>"; }).join("") +
+      "</select></td>" +
+      '<td>' + (l.estado === "Nuevo" ? '<button class="btn-ghost" data-act="attend" data-id="' + l.id + '">Marcar atendido</button>' : "") + "</td>" +
+      "</tr>"
+    );
+  }
+
+  function leadTableHtml() {
+    var q = S.f.lq.toLowerCase();
+    var rows = S.leads.filter(function (l) {
+      return (!q || (l.nombre + " " + l.correo).toLowerCase().indexOf(q) >= 0) &&
+             (S.f.le === "Todos" || l.estado === S.f.le);
+    });
+    if (!rows.length) return '<div class="empty">No hay prospectos que coincidan con el filtro.</div>';
+    return '<div class="table-wrap"><table class="dt"><thead><tr><th>Prospecto</th><th>Campaña de origen</th><th>Puntaje</th><th>Sin respuesta</th><th>Estado</th><th></th></tr></thead><tbody>' +
+      rows.map(leadRowHtml).join("") + "</tbody></table></div>";
+  }
+
+  function viewCRM() {
+    var counts = ESTADO_LEAD.map(function (e) {
+      var n = S.leads.filter(function (l) { return l.estado === e; }).length;
+      return '<span class="pill-count">' + e + " <b>" + n + "</b></span>";
+    }).join("");
+    return (
+      '<div class="toolbar"><input class="inp" id="f-lq" placeholder="Buscar nombre o correo" value="' + esc(S.f.lq) + '">' +
+      '<select class="inp sel" id="f-le"><option>Todos</option>' +
+      ESTADO_LEAD.map(function (e) { return "<option" + (S.f.le === e ? " selected" : "") + ">" + e + "</option>"; }).join("") +
+      '</select><button class="btn" data-act="new-lead">+ Nuevo lead</button></div>' +
+      '<div class="pills">' + counts + "</div>" +
+      '<p class="hint">Un prospecto en estado <em>Nuevo</em> por más de 1 hora aparece en rojo: es el tiempo de respuesta que el diagnóstico identificó como causa de pérdida.</p>' +
+      '<div id="lead-table">' + leadTableHtml() + "</div>"
+    );
+  }
+
+  function viewReportes() {
+    var ejec = S.campanas.reduce(function (a, c) { return a + c.ejecutado; }, 0);
+    var val = S.campanas.reduce(function (a, c) { return a + c.valor; }, 0);
+    var canales = {};
+    S.campanas.forEach(function (c) { canales[c.canal] = (canales[c.canal] || 0) + c.ejecutado; });
+    var maxC = Math.max.apply(null, Object.keys(canales).map(function (k) { return canales[k]; }).concat([1]));
+    var canalHtml = Object.keys(canales).sort(function (a, b) { return canales[b] - canales[a]; }).map(function (k) {
+      return '<div class="hb"><span>' + esc(k) + "</span><div class=\"hb-bar\"><i style=\"width:" + Math.round(canales[k] / maxC * 100) + '%"></i></div><b>' + fmt(canales[k]) + "</b></div>";
+    }).join("");
+    var total = S.leads.length;
+    var contact = S.leads.filter(function (l) { return l.estado !== "Nuevo"; }).length;
+    var calif = S.leads.filter(function (l) { return l.estado === "Calificado" || l.estado === "Convertido"; }).length;
+    var conv = S.leads.filter(function (l) { return l.estado === "Convertido"; }).length;
+    var etapas = [["Leads totales", total], ["Atendidos", contact], ["Calificados", calif], ["Convertidos", conv]];
+    var fun = etapas.map(function (e) {
+      var p = total ? Math.round(e[1] / total * 100) : 0;
+      return '<div class="hb"><span>' + e[0] + '</span><div class="hb-bar"><i style="width:' + p + '%"></i></div><b>' + e[1] + "</b></div>";
+    }).join("");
+    var roiRows = S.campanas.map(function (c) {
+      return "<tr><td>" + esc(c.nombre) + "</td><td>" + fmt(c.ejecutado) + "</td><td>" + leadsOf(c).length + "</td><td>" + fmt(c.valor) +
+        '</td><td class="' + (roi(c) >= 0 ? "good" : "bad") + '">' + pctTxt(roi(c)) + "</td></tr>";
+    }).join("");
+    return (
+      '<div class="kpis">' +
+      kpi("Inversión ejecutada", fmt(ejec), "Todas las campañas") +
+      kpi("Valor generado", fmt(val), "Atribuido a campañas") +
+      kpi("Leads captados", total, "Ciclo actual") +
+      kpi("ROI global", pctTxt(ejec ? (val - ejec) / ejec : 0), "Valor vs. inversión", val >= ejec ? "good" : "bad") +
+      "</div>" +
+      '<div class="grid2">' +
+      '<div class="panel"><div class="panel-h">Inversión por canal</div>' + canalHtml + "</div>" +
+      '<div class="panel"><div class="panel-h">Embudo de conversión</div>' + fun + "</div>" +
+      "</div>" +
+      '<div class="panel" style="margin-top:14px"><div class="panel-h">ROI por campaña</div>' +
+      '<div class="table-wrap"><table class="dt"><thead><tr><th>Campaña</th><th>Invertido</th><th>Leads</th><th>Valor generado</th><th>ROI</th></tr></thead><tbody>' + roiRows + "</tbody></table></div></div>"
+    );
+  }
+
+  var ROLES = {
+    "Gerente de marketing": { desc: "Acceso completo a campañas y presupuestos.", perms: ["Crear y editar campañas", "Aprobar y activar promociones", "Ver y gestionar leads", "Ver reportes y márgenes", "Exportar datos de prospectos (con registro)"] },
+    "Analista de datos": { desc: "Solo lectura de leads y reportes.", perms: ["Ver reportes avanzados", "Exportar métricas (con registro)", "Ver leads (solo lectura)", "Sin edición de presupuestos"] },
+    "Creador de contenido": { desc: "Carga de piezas y calendario, sin presupuestos.", perms: ["Cargar piezas creativas", "Ver el calendario de campañas", "Guardar borradores", "Sin acceso a presupuestos"] },
+    "Administrador": { desc: "Gestiona usuarios y permisos del sistema.", perms: ["Crear y desactivar cuentas", "Asignar roles y permisos", "Revisar el registro de auditoría"] }
+  };
+  var CUENTAS = [
+    ["Joseph Rodríguez Solano", "Manager y Backend", "Administrador", "Activo"],
+    ["Dylan Navarro Montero", "Analista y Diseñador (UX/UI)", "Analista de datos", "Activo"],
+    ["Randy Rodríguez Delgado", "Frontend e Implementador", "Creador de contenido", "Activo"],
+    ["Cristhofer Lezcano Fernández", "QA y Soporte", "Gerente de marketing", "Activo"]
+  ];
+  var rolSel = "Gerente de marketing";
+
+  function viewUsuarios() {
+    var cards = Object.keys(ROLES).filter(function (r) { return r !== "Administrador"; }).map(function (r) {
+      return '<button class="role-card' + (rolSel === r ? " is-on" : "") + '" data-act="role" data-id="' + esc(r) + '"><strong>' + esc(r) + "</strong><small>" + esc(ROLES[r].desc) + "</small></button>";
+    }).join("");
+    var r = ROLES[rolSel];
+    return (
+      '<div class="roles">' + cards + "</div>" +
+      '<div class="panel" style="margin-top:14px"><div class="panel-h">Permisos de: ' + esc(rolSel) + "</div><ul class=\"perms\">" +
+      r.perms.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("") + "</ul></div>" +
+      '<div class="panel" style="margin-top:14px"><div class="panel-h">Cuentas activas</div><div class="table-wrap"><table class="dt"><thead><tr><th>Nombre</th><th>Función en el proyecto</th><th>Rol en el sistema</th><th>Acceso</th></tr></thead><tbody>' +
+      CUENTAS.map(function (c) { return "<tr><td><strong>" + esc(c[0]) + "</strong></td><td>" + esc(c[1]) + "</td><td>" + esc(c[2]) + '</td><td><span class="tag tag-activa">' + c[3] + "</span></td></tr>"; }).join("") +
+      "</tbody></table></div></div>"
+    );
+  }
+
+  var VIEWS = { dashboard: viewDashboard, campanas: viewCampanas, crm: viewCRM, reportes: viewReportes, usuarios: viewUsuarios };
+
+  function render() {
+    view.innerHTML = VIEWS[S.view]();
+    document.querySelectorAll(".nav-btn").forEach(function (b) {
+      b.classList.toggle("is-on", b.getAttribute("data-nav") === S.view);
+    });
+    renderTop();
+  }
+
+  /* ---------- Notificaciones y modal ---------- */
+  var toastEl = $("#toast");
+  var toastT;
+  function toast(msg, bad) {
+    toastEl.textContent = msg;
+    toastEl.className = "toast show" + (bad ? " bad" : "");
+    clearTimeout(toastT);
+    toastT = setTimeout(function () { toastEl.className = "toast"; }, 2800);
+  }
+
+  var modalBack = $("#modal-back");
+  var modal = $("#modal");
+  function openModal(html) { modal.innerHTML = html; modalBack.hidden = false; var f = modal.querySelector("input,select,textarea"); if (f) f.focus(); }
+  function closeModal() { modalBack.hidden = true; modal.innerHTML = ""; }
+
+  function campForm() {
+    return (
+      '<form id="form-camp" novalidate>' +
+      '<h3 id="modal-title">Nueva campaña</h3>' +
+      '<label>Nombre<input class="inp" name="nombre" required></label>' +
+      '<div class="row2"><label>Canal<select class="inp" name="canal">' + CANALES.map(function (c) { return "<option>" + c + "</option>"; }).join("") + "</select></label>" +
+      '<label>Tipo<select class="inp" name="tipo"><option>Publicidad</option><option>Promoción</option></select></label></div>' +
+      '<div class="row2"><label>Presupuesto asignado (₡)<input class="inp" name="asignado" type="number" min="1"></label>' +
+      '<label>Vigencia desde<input class="inp" name="inicio" type="date"></label></div>' +
+      '<label>Vigencia hasta<input class="inp" name="fin" type="date"></label>' +
+      '<fieldset class="promo" id="promo-box"><legend>Datos exigidos para promociones (Ley 7472)</legend>' +
+      '<div class="row2"><label>Precio de la oferta (₡)<input class="inp" name="precio" type="number" min="1"></label>' +
+      '<label>Cantidad disponible<input class="inp" name="cantidad" type="number" min="1"></label></div>' +
+      '<label>Restricciones<input class="inp" name="restricciones" placeholder="Ej.: válido en tienda y en línea"></label>' +
+      '<label class="chk"><input type="checkbox" name="stock"> Existencias verificadas con bodega</label>' +
+      "</fieldset>" +
+      '<div class="errs" id="errs" hidden></div>' +
+      '<div class="actions"><button type="button" class="btn-ghost" data-act="close">Cancelar</button><button class="btn" type="submit">Crear campaña</button></div>' +
+      "</form>"
+    );
+  }
+
+  function leadForm() {
+    return (
+      '<form id="form-lead" novalidate>' +
+      '<h3 id="modal-title">Nuevo prospecto</h3>' +
+      '<label>Nombre<input class="inp" name="nombre" required></label>' +
+      '<label>Correo<input class="inp" name="correo" type="email" required></label>' +
+      '<div class="row2"><label>Campaña de origen<select class="inp" name="camp">' +
+      S.campanas.map(function (c) { return '<option value="' + c.id + '">' + esc(c.nombre) + "</option>"; }).join("") +
+      '</select></label><label>Puntaje (0-100)<input class="inp" name="puntaje" type="number" min="0" max="100" value="50"></label></div>' +
+      '<label class="chk"><input type="checkbox" name="consent"> El prospecto consintió el uso de sus datos para contacto comercial (Ley 8968)</label>' +
+      '<div class="errs" id="errs" hidden></div>' +
+      '<div class="actions"><button type="button" class="btn-ghost" data-act="close">Cancelar</button><button class="btn" type="submit">Guardar prospecto</button></div>' +
+      "</form>"
+    );
+  }
+
+  function showErrs(list) {
+    var box = $("#errs");
+    box.hidden = false;
+    box.innerHTML = "<strong>No se puede guardar todavía:</strong><ul>" + list.map(function (e) { return "<li>" + esc(e) + "</li>"; }).join("") + "</ul>";
+  }
+
+  /* ---------- Eventos ---------- */
+  var app = $("#app");
+  app.addEventListener("click", function (ev) {
+    var n = ev.target.closest("[data-nav]");
+    if (n) { S.view = n.getAttribute("data-nav"); S.confirm = null; render(); return; }
+    var b = ev.target.closest("[data-act]");
+    if (!b) return;
+    var act = b.getAttribute("data-act"), id = b.getAttribute("data-id");
+    if (act === "new-camp") { openModal(campForm()); return; }
+    if (act === "new-lead") { openModal(leadForm()); return; }
+    if (act === "toggle") {
+      var c = campById(id);
+      if (c.estado === "Activa") c.estado = "Pausada";
+      else if (c.estado === "Pausada") {
+        if (c.tipo === "Promoción" && !c.stock) { toast("No se puede reactivar sin existencias verificadas.", true); return; }
+        c.estado = "Activa";
+      }
+      toast("Campaña " + (c.estado === "Activa" ? "activa" : "pausada") + ": " + c.nombre);
+      render(); return;
+    }
+    if (act === "del") {
+      if (S.confirm !== "del-" + id) { S.confirm = "del-" + id; render(); setTimeout(function () { if (S.confirm === "del-" + id) { S.confirm = null; if (S.view === "campanas") render(); } }, 3000); return; }
+      S.campanas = S.campanas.filter(function (c) { return c.id !== id; });
+      S.leads = S.leads.filter(function (l) { return l.camp !== id; });
+      S.confirm = null; toast("Campaña eliminada."); render(); return;
+    }
+    if (act === "attend") {
+      var l = S.leads.filter(function (x) { return x.id === id; })[0];
+      l.estado = "Contactado"; toast("Prospecto marcado como atendido: " + l.nombre); render(); return;
+    }
+    if (act === "role") { rolSel = id; render(); return; }
+  });
+
+  app.addEventListener("input", function (ev) {
+    var t = ev.target;
+    if (t.id === "f-cq") { S.f.cq = t.value; $("#camp-table").innerHTML = campTableHtml(); }
+    if (t.id === "f-lq") { S.f.lq = t.value; $("#lead-table").innerHTML = leadTableHtml(); }
+  });
+
+  app.addEventListener("change", function (ev) {
+    var t = ev.target;
+    if (t.id === "f-ce") { S.f.ce = t.value; $("#camp-table").innerHTML = campTableHtml(); }
+    if (t.id === "f-le") { S.f.le = t.value; $("#lead-table").innerHTML = leadTableHtml(); }
+    if (t.getAttribute("data-change") === "stage") {
+      var l = S.leads.filter(function (x) { return x.id === t.getAttribute("data-id"); })[0];
+      l.estado = t.value; toast("Estado actualizado: " + l.nombre); render();
+    }
+  });
+
+  modalBack.addEventListener("click", function (ev) {
+    if (ev.target === modalBack || ev.target.closest('[data-act="close"]')) closeModal();
+  });
+  document.addEventListener("keydown", function (ev) { if (ev.key === "Escape" && !modalBack.hidden) closeModal(); });
+
+  modal.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var form = ev.target;
+    var d = Object.fromEntries(new FormData(form).entries());
+
+    if (form.id === "form-camp") {
+      var e = [];
+      if (!d.nombre || !d.nombre.trim()) e.push("Escriba el nombre de la campaña.");
+      if (!(Number(d.asignado) > 0)) e.push("El presupuesto asignado debe ser mayor que cero.");
+      if (!d.inicio || !d.fin) e.push("Indique la vigencia (fecha de inicio y de fin).");
+      else if (d.fin < d.inicio) e.push("La fecha de fin no puede ser anterior a la de inicio.");
+      if (d.tipo === "Promoción") {
+        if (!(Number(d.precio) > 0)) e.push("Las promociones requieren precio de la oferta.");
+        if (!(Number(d.cantidad) > 0)) e.push("Las promociones requieren cantidad disponible.");
+        if (!d.restricciones || !d.restricciones.trim()) e.push("Indique las restricciones de la promoción (puede ser \"Ninguna\").");
+        if (!d.stock) e.push("Confirme que las existencias fueron verificadas con bodega antes de publicar.");
+      }
+      if (e.length) { showErrs(e); return; }
+      var num = S.campanas.length + 1;
+      S.campanas.push({
+        id: "CMP-2026-" + String(num).padStart(3, "0"), nombre: d.nombre.trim(), canal: d.canal,
+        asignado: Number(d.asignado), ejecutado: 0, valor: 0, estado: "Activa", tipo: d.tipo,
+        inicio: d.inicio, fin: d.fin,
+        precio: Number(d.precio) || undefined, cantidad: Number(d.cantidad) || undefined,
+        restricciones: d.restricciones || undefined, stock: !!d.stock
+      });
+      closeModal(); S.view = "campanas"; S.f.ce = "Todos"; render();
+      toast("Campaña creada y validada.");
+      return;
+    }
+
+    if (form.id === "form-lead") {
+      var el = [];
+      if (!d.nombre || !d.nombre.trim()) el.push("Escriba el nombre del prospecto.");
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.correo || "")) el.push("Escriba un correo válido.");
+      if (!d.consent) el.push("Registre el consentimiento del prospecto antes de guardarlo (Ley 8968).");
+      if (el.length) { showErrs(el); return; }
+      S.leads.unshift({ id: "L-" + String(S.leads.length + 1).padStart(2, "0"), nombre: d.nombre.trim(), correo: d.correo, camp: d.camp, puntaje: Math.min(100, Math.max(0, Number(d.puntaje) || 0)), estado: "Nuevo", creado: Date.now(), consentimiento: true });
+      closeModal(); S.view = "crm"; render();
+      toast("Prospecto registrado. Recuerde atenderlo pronto.");
+    }
+  });
+
+  render();
+  setInterval(function () { if (S.view === "dashboard" || S.view === "crm") { renderTop(); } }, 30000);
+})();
+</script>
+</main>
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Utilidades ---------- */
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var fmt = function (n) { return "₡" + Math.round(n || 0).toLocaleString("es-CR"); };
+  var esc = function (s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  };
+  var MIN = 60000;
+  var minutesAgo = function (ts) { return Math.max(0, Math.round((Date.now() - ts) / MIN)); };
+  var since = function (ts) {
+    var m = minutesAgo(ts);
+    if (m < 60) return m + " min";
+    var h = Math.floor(m / 60);
+    if (h < 24) return h + " h";
+    return Math.floor(h / 24) + " d";
+  };
+  var roi = function (c) { return c.ejecutado > 0 ? (c.valor - c.ejecutado) / c.ejecutado : 0; };
+  var pctTxt = function (v) { return (v >= 0 ? "+" : "") + (v * 100).toFixed(1) + "%"; };
+
+  var CANALES = ["Multicanal", "Meta Ads", "Google Ads", "Instagram", "Email", "WhatsApp", "Tienda física"];
+  var ESTADO_LEAD = ["Nuevo", "Contactado", "Calificado", "Convertido", "Descartado"];
+  var ESTADO_CAMP = ["Activa", "Pausada", "Finalizada"];
+
+  /* ---------- Datos de ejemplo (basados en el mockup) ---------- */
+  var now = Date.now();
+  var S = {
+    view: "dashboard",
+    campanas: [
+      { id: "CMP-2026-001", nombre: "Feria Tecnológica San José", canal: "Multicanal", asignado: 3500000, ejecutado: 3500000, valor: 0, estado: "Finalizada", tipo: "Publicidad", inicio: "2026-10-20", fin: "2026-10-31" },
+      { id: "CMP-2026-002", nombre: "Black Friday Gamer", canal: "Meta Ads", asignado: 4000000, ejecutado: 3200000, valor: 2100000, estado: "Activa", tipo: "Promoción", inicio: "2026-11-01", fin: "2026-11-30", precio: 99000, cantidad: 120, restricciones: "Válido en tienda y en línea", stock: true },
+      { id: "CMP-2026-003", nombre: "Regreso a Clases — Laptops", canal: "Instagram", asignado: 2100000, ejecutado: 2100000, valor: 1400000, estado: "Pausada", tipo: "Promoción", inicio: "2026-08-01", fin: "2026-08-31", precio: 399000, cantidad: 15, restricciones: "Hasta agotar existencias", stock: true },
+      { id: "CMP-2026-004", nombre: "Lanzamiento PC Gaming Ryzen", canal: "Google Ads", asignado: 3000000, ejecutado: 1800000, valor: 2700000, estado: "Activa", tipo: "Publicidad", inicio: "2026-11-05", fin: "2026-12-05" },
+      { id: "CMP-2026-005", nombre: "Retargeting Carrito Abandonado", canal: "Email", asignado: 500000, ejecutado: 400000, valor: 520000, estado: "Activa", tipo: "Publicidad", inicio: "2026-10-15", fin: "2026-11-30" }
+    ],
+    leads: [
+      { id: "L-01", nombre: "Mariana Rojas", correo: "mariana.rojas@gmail.com", camp: "CMP-2026-002", puntaje: 92, estado: "Contactado", creado: now - 25 * MIN, consentimiento: true },
+      { id: "L-02", nombre: "Josué Salas", correo: "josue.salas88@gmail.com", camp: "CMP-2026-004", puntaje: 87, estado: "Nuevo", creado: now - 75 * MIN, consentimiento: true },
+      { id: "L-03", nombre: "Karla Araya", correo: "karla.araya@hotmail.com", camp: "CMP-2026-005", puntaje: 61, estado: "Calificado", creado: now - 240 * MIN, consentimiento: true },
+      { id: "L-04", nombre: "Diego Vargas", correo: "dvargas.tech@gmail.com", camp: "CMP-2026-004", puntaje: 54, estado: "Nuevo", creado: now - 20 * MIN, consentimiento: true },
+      { id: "L-05", nombre: "Sofía Chinchilla", correo: "sofia.chinchilla@yahoo.com", camp: "CMP-2026-004", puntaje: 38, estado: "Contactado", creado: now - 300 * MIN, consentimiento: true },
+      { id: "L-06", nombre: "Esteban Mora", correo: "emora.cr@gmail.com", camp: "CMP-2026-002", puntaje: 95, estado: "Convertido", creado: now - 1440 * MIN, consentimiento: true },
+      { id: "L-07", nombre: "Paola Jiménez", correo: "paola.j@outlook.com", camp: "CMP-2026-003", puntaje: 28, estado: "Descartado", creado: now - 1800 * MIN, consentimiento: true }
+    ],
+    f: { cq: "", ce: "Todos", lq: "", le: "Todos" },
+    confirm: null
+  };
+
+  var campById = function (id) { for (var i = 0; i < S.campanas.length; i++) if (S.campanas[i].id === id) return S.campanas[i]; return null; };
+  var leadsOf = function (c) { return S.leads.filter(function (l) { return l.camp === c.id; }); };
+  var sinAtender = function () { return S.leads.filter(function (l) { return l.estado === "Nuevo" && minutesAgo(l.creado) > 60; }); };
+
+  /* ---------- Render de vistas ---------- */
+  var view = $("#view");
+  var topstats = $("#app-topstats");
+
+  function renderTop() {
+    var activas = S.campanas.filter(function (c) { return c.estado === "Activa"; }).length;
+    topstats.innerHTML =
+      activas + " campañas activas · " + S.leads.length + " leads · " +
+      '<span class="' + (sinAtender().length ? "bad" : "good") + '">' + sinAtender().length + " sin atender &gt; 1 h</span>";
+  }
+
+  function kpi(label, value, sub, cls) {
+    return '<div class="kpi"><div class="kpi-l">' + label + '</div><div class="kpi-v ' + (cls || "") + '">' + value + '</div><div class="kpi-s">' + sub + "</div></div>";
+  }
+
+  function viewDashboard() {
+    var asignado = S.campanas.reduce(function (a, c) { return a + c.asignado; }, 0);
+    var ejec = S.campanas.reduce(function (a, c) { return a + c.ejecutado; }, 0);
+    var val = S.campanas.reduce(function (a, c) { return a + c.valor; }, 0);
+    var activas = S.campanas.filter(function (c) { return c.estado === "Activa"; }).length;
+    var roiT = ejec > 0 ? (val - ejec) / ejec : 0;
+    var dias = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+    var leads7 = [31, 48, 44, 27, 39, 52, 36];
+    var max = Math.max.apply(null, leads7);
+    var bars = leads7.map(function (v, i) {
+      return '<div class="bar-col"><div class="bar" style="height:' + Math.round(v / max * 100) + '%"><span>' + v + '</span></div><div class="bar-l">' + dias[i] + "</div></div>";
+    }).join("");
+    var alerta = sinAtender().length
+      ? '<div class="alert">⚠ ' + sinAtender().length + " prospecto(s) llevan más de 1 hora sin respuesta. Atiéndalos desde el Mini-CRM.</div>"
+      : '<div class="ok">✓ Todos los prospectos nuevos fueron atendidos en menos de 1 hora.</div>';
+    var recientes = S.leads.slice().sort(function (a, b) { return b.creado - a.creado; }).slice(0, 5).map(function (l) {
+      var c = campById(l.camp);
+      return '<div class="row"><div><strong>' + esc(l.nombre) + '</strong><small>' + esc(c ? c.nombre : "") + '</small></div><span class="score">' + l.puntaje + "</span></div>";
+    }).join("");
+    return (
+      '<h3 class="vh">Panel general</h3>' +
+      '<div class="kpis">' +
+      kpi("Presupuesto asignado", fmt(asignado), fmt(ejec) + " ejecutado") +
+      kpi("Campañas activas", activas + " / " + S.campanas.length, "Este ciclo") +
+      kpi("Leads captados", S.leads.length, "Últimos 7 días") +
+      kpi("ROI estimado", pctTxt(roiT), "Valor generado vs. inversión", roiT >= 0 ? "good" : "bad") +
+      "</div>" + alerta +
+      '<div class="grid2">' +
+      '<div class="panel"><div class="panel-h">Leads captados · últimos 7 días</div><div class="chart">' + bars + "</div></div>" +
+      '<div class="panel"><div class="panel-h">Mini-CRM · leads recientes</div>' + recientes + "</div>" +
+      "</div>"
+    );
+  }
+
+  function campRowHtml(c) {
+    var p = c.asignado > 0 ? Math.min(100, Math.round(c.ejecutado / c.asignado * 100)) : 0;
+    var del = S.confirm === "del-" + c.id ? "¿Confirmar?" : "Eliminar";
+    return (
+      "<tr>" +
+      "<td><strong>" + esc(c.nombre) + "</strong><small>" + c.id + " · " + esc(c.tipo) + "</small></td>" +
+      "<td>" + esc(c.canal) + "</td>" +
+      "<td>" + fmt(c.ejecutado) + " / " + fmt(c.asignado) +
+      '<div class="bar-h"><i style="width:' + p + '%"></i></div></td>' +
+      "<td>" + leadsOf(c).length + "</td>" +
+      '<td><span class="tag tag-' + c.estado.toLowerCase() + '">' + c.estado + "</span></td>" +
+      '<td class="acts"><button class="btn-ghost" data-act="toggle" data-id="' + c.id + '">' + (c.estado === "Activa" ? "Pausar" : c.estado === "Pausada" ? "Reanudar" : "—") + "</button>" +
+      '<button class="btn-ghost danger" data-act="del" data-id="' + c.id + '">' + del + "</button></td>" +
+      "</tr>"
+    );
+  }
+
+  function campTableHtml() {
+    var q = S.f.cq.toLowerCase();
+    var rows = S.campanas.filter(function (c) {
+      return (!q || (c.nombre + " " + c.id + " " + c.canal).toLowerCase().indexOf(q) >= 0) &&
+             (S.f.ce === "Todos" || c.estado === S.f.ce);
+    });
+    if (!rows.length) return '<div class="empty">No hay campañas que coincidan con el filtro.</div>';
+    return '<div class="table-wrap"><table class="dt"><thead><tr><th>Campaña</th><th>Canal</th><th>Presupuesto</th><th>Leads</th><th>Estado</th><th></th></tr></thead><tbody>' +
+      rows.map(campRowHtml).join("") + "</tbody></table></div>";
+  }
+
+  function viewCampanas() {
+    return (
+      '<div class="toolbar"><input class="inp" id="f-cq" placeholder="Buscar campaña, canal o código" value="' + esc(S.f.cq) + '">' +
+      '<select class="inp sel" id="f-ce"><option>Todos</option>' +
+      ESTADO_CAMP.map(function (e) { return "<option" + (S.f.ce === e ? " selected" : "") + ">" + e + "</option>"; }).join("") +
+      '</select><button class="btn" data-act="new-camp">+ Nueva campaña</button></div>' +
+      '<div id="camp-table">' + campTableHtml() + "</div>"
+    );
+  }
+
+  function leadRowHtml(l) {
+    var c = campById(l.camp);
+    var espera = l.estado === "Nuevo"
+      ? '<span class="' + (minutesAgo(l.creado) > 60 ? "bad" : "") + '">' + since(l.creado) + "</span>"
+      : '<span class="muted">Atendido</span>';
+    return (
+      "<tr>" +
+      "<td><strong>" + esc(l.nombre) + "</strong><small>" + esc(l.correo) + "</small></td>" +
+      "<td>" + esc(c ? c.nombre : "—") + "</td>" +
+      '<td><span class="score">' + l.puntaje + "</span></td>" +
+      "<td>" + espera + "</td>" +
+      '<td><select class="inp sel sm" data-change="stage" data-id="' + l.id + '">' +
+      ESTADO_LEAD.map(function (e) { return "<option" + (l.estado === e ? " selected" : "") + ">" + e + "</option>"; }).join("") +
+      "</select></td>" +
+      '<td>' + (l.estado === "Nuevo" ? '<button class="btn-ghost" data-act="attend" data-id="' + l.id + '">Marcar atendido</button>' : "") + "</td>" +
+      "</tr>"
+    );
+  }
+
+  function leadTableHtml() {
+    var q = S.f.lq.toLowerCase();
+    var rows = S.leads.filter(function (l) {
+      return (!q || (l.nombre + " " + l.correo).toLowerCase().indexOf(q) >= 0) &&
+             (S.f.le === "Todos" || l.estado === S.f.le);
+    });
+    if (!rows.length) return '<div class="empty">No hay prospectos que coincidan con el filtro.</div>';
+    return '<div class="table-wrap"><table class="dt"><thead><tr><th>Prospecto</th><th>Campaña de origen</th><th>Puntaje</th><th>Sin respuesta</th><th>Estado</th><th></th></tr></thead><tbody>' +
+      rows.map(leadRowHtml).join("") + "</tbody></table></div>";
+  }
+
+  function viewCRM() {
+    var counts = ESTADO_LEAD.map(function (e) {
+      var n = S.leads.filter(function (l) { return l.estado === e; }).length;
+      return '<span class="pill-count">' + e + " <b>" + n + "</b></span>";
+    }).join("");
+    return (
+      '<div class="toolbar"><input class="inp" id="f-lq" placeholder="Buscar nombre o correo" value="' + esc(S.f.lq) + '">' +
+      '<select class="inp sel" id="f-le"><option>Todos</option>' +
+      ESTADO_LEAD.map(function (e) { return "<option" + (S.f.le === e ? " selected" : "") + ">" + e + "</option>"; }).join("") +
+      '</select><button class="btn" data-act="new-lead">+ Nuevo lead</button></div>' +
+      '<div class="pills">' + counts + "</div>" +
+      '<p class="hint">Un prospecto en estado <em>Nuevo</em> por más de 1 hora aparece en rojo: es el tiempo de respuesta que el diagnóstico identificó como causa de pérdida.</p>' +
+      '<div id="lead-table">' + leadTableHtml() + "</div>"
+    );
+  }
+
+  function viewReportes() {
+    var ejec = S.campanas.reduce(function (a, c) { return a + c.ejecutado; }, 0);
+    var val = S.campanas.reduce(function (a, c) { return a + c.valor; }, 0);
+    var canales = {};
+    S.campanas.forEach(function (c) { canales[c.canal] = (canales[c.canal] || 0) + c.ejecutado; });
+    var maxC = Math.max.apply(null, Object.keys(canales).map(function (k) { return canales[k]; }).concat([1]));
+    var canalHtml = Object.keys(canales).sort(function (a, b) { return canales[b] - canales[a]; }).map(function (k) {
+      return '<div class="hb"><span>' + esc(k) + "</span><div class=\"hb-bar\"><i style=\"width:" + Math.round(canales[k] / maxC * 100) + '%"></i></div><b>' + fmt(canales[k]) + "</b></div>";
+    }).join("");
+    var total = S.leads.length;
+    var contact = S.leads.filter(function (l) { return l.estado !== "Nuevo"; }).length;
+    var calif = S.leads.filter(function (l) { return l.estado === "Calificado" || l.estado === "Convertido"; }).length;
+    var conv = S.leads.filter(function (l) { return l.estado === "Convertido"; }).length;
+    var etapas = [["Leads totales", total], ["Atendidos", contact], ["Calificados", calif], ["Convertidos", conv]];
+    var fun = etapas.map(function (e) {
+      var p = total ? Math.round(e[1] / total * 100) : 0;
+      return '<div class="hb"><span>' + e[0] + '</span><div class="hb-bar"><i style="width:' + p + '%"></i></div><b>' + e[1] + "</b></div>";
+    }).join("");
+    var roiRows = S.campanas.map(function (c) {
+      return "<tr><td>" + esc(c.nombre) + "</td><td>" + fmt(c.ejecutado) + "</td><td>" + leadsOf(c).length + "</td><td>" + fmt(c.valor) +
+        '</td><td class="' + (roi(c) >= 0 ? "good" : "bad") + '">' + pctTxt(roi(c)) + "</td></tr>";
+    }).join("");
+    return (
+      '<div class="kpis">' +
+      kpi("Inversión ejecutada", fmt(ejec), "Todas las campañas") +
+      kpi("Valor generado", fmt(val), "Atribuido a campañas") +
+      kpi("Leads captados", total, "Ciclo actual") +
+      kpi("ROI global", pctTxt(ejec ? (val - ejec) / ejec : 0), "Valor vs. inversión", val >= ejec ? "good" : "bad") +
+      "</div>" +
+      '<div class="grid2">' +
+      '<div class="panel"><div class="panel-h">Inversión por canal</div>' + canalHtml + "</div>" +
+      '<div class="panel"><div class="panel-h">Embudo de conversión</div>' + fun + "</div>" +
+      "</div>" +
+      '<div class="panel" style="margin-top:14px"><div class="panel-h">ROI por campaña</div>' +
+      '<div class="table-wrap"><table class="dt"><thead><tr><th>Campaña</th><th>Invertido</th><th>Leads</th><th>Valor generado</th><th>ROI</th></tr></thead><tbody>' + roiRows + "</tbody></table></div></div>"
+    );
+  }
+
+  var ROLES = {
+    "Gerente de marketing": { desc: "Acceso completo a campañas y presupuestos.", perms: ["Crear y editar campañas", "Aprobar y activar promociones", "Ver y gestionar leads", "Ver reportes y márgenes", "Exportar datos de prospectos (con registro)"] },
+    "Analista de datos": { desc: "Solo lectura de leads y reportes.", perms: ["Ver reportes avanzados", "Exportar métricas (con registro)", "Ver leads (solo lectura)", "Sin edición de presupuestos"] },
+    "Creador de contenido": { desc: "Carga de piezas y calendario, sin presupuestos.", perms: ["Cargar piezas creativas", "Ver el calendario de campañas", "Guardar borradores", "Sin acceso a presupuestos"] },
+    "Administrador": { desc: "Gestiona usuarios y permisos del sistema.", perms: ["Crear y desactivar cuentas", "Asignar roles y permisos", "Revisar el registro de auditoría"] }
+  };
+  var CUENTAS = [
+    ["Joseph Rodríguez Solano", "Manager y Backend", "Administrador", "Activo"],
+    ["Dylan Navarro Montero", "Analista y Diseñador (UX/UI)", "Analista de datos", "Activo"],
+    ["Randy Rodríguez Delgado", "Frontend e Implementador", "Creador de contenido", "Activo"],
+    ["Cristhofer Lezcano Fernández", "QA y Soporte", "Gerente de marketing", "Activo"]
+  ];
+  var rolSel = "Gerente de marketing";
+
+  function viewUsuarios() {
+    var cards = Object.keys(ROLES).filter(function (r) { return r !== "Administrador"; }).map(function (r) {
+      return '<button class="role-card' + (rolSel === r ? " is-on" : "") + '" data-act="role" data-id="' + esc(r) + '"><strong>' + esc(r) + "</strong><small>" + esc(ROLES[r].desc) + "</small></button>";
+    }).join("");
+    var r = ROLES[rolSel];
+    return (
+      '<div class="roles">' + cards + "</div>" +
+      '<div class="panel" style="margin-top:14px"><div class="panel-h">Permisos de: ' + esc(rolSel) + "</div><ul class=\"perms\">" +
+      r.perms.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("") + "</ul></div>" +
+      '<div class="panel" style="margin-top:14px"><div class="panel-h">Cuentas activas</div><div class="table-wrap"><table class="dt"><thead><tr><th>Nombre</th><th>Función en el proyecto</th><th>Rol en el sistema</th><th>Acceso</th></tr></thead><tbody>' +
+      CUENTAS.map(function (c) { return "<tr><td><strong>" + esc(c[0]) + "</strong></td><td>" + esc(c[1]) + "</td><td>" + esc(c[2]) + '</td><td><span class="tag tag-activa">' + c[3] + "</span></td></tr>"; }).join("") +
+      "</tbody></table></div></div>"
+    );
+  }
+
+  var VIEWS = { dashboard: viewDashboard, campanas: viewCampanas, crm: viewCRM, reportes: viewReportes, usuarios: viewUsuarios };
+
+  function render() {
+    view.innerHTML = VIEWS[S.view]();
+    document.querySelectorAll(".nav-btn").forEach(function (b) {
+      b.classList.toggle("is-on", b.getAttribute("data-nav") === S.view);
+    });
+    renderTop();
+  }
+
+  /* ---------- Notificaciones y modal ---------- */
+  var toastEl = $("#toast");
+  var toastT;
+  function toast(msg, bad) {
+    toastEl.textContent = msg;
+    toastEl.className = "toast show" + (bad ? " bad" : "");
+    clearTimeout(toastT);
+    toastT = setTimeout(function () { toastEl.className = "toast"; }, 2800);
+  }
+
+  var modalBack = $("#modal-back");
+  var modal = $("#modal");
+  function openModal(html) { modal.innerHTML = html; modalBack.hidden = false; var f = modal.querySelector("input,select,textarea"); if (f) f.focus(); }
+  function closeModal() { modalBack.hidden = true; modal.innerHTML = ""; }
+
+  function campForm() {
+    return (
+      '<form id="form-camp" novalidate>' +
+      '<h3 id="modal-title">Nueva campaña</h3>' +
+      '<label>Nombre<input class="inp" name="nombre" required></label>' +
+      '<div class="row2"><label>Canal<select class="inp" name="canal">' + CANALES.map(function (c) { return "<option>" + c + "</option>"; }).join("") + "</select></label>" +
+      '<label>Tipo<select class="inp" name="tipo"><option>Publicidad</option><option>Promoción</option></select></label></div>' +
+      '<div class="row2"><label>Presupuesto asignado (₡)<input class="inp" name="asignado" type="number" min="1"></label>' +
+      '<label>Vigencia desde<input class="inp" name="inicio" type="date"></label></div>' +
+      '<label>Vigencia hasta<input class="inp" name="fin" type="date"></label>' +
+      '<fieldset class="promo" id="promo-box"><legend>Datos exigidos para promociones (Ley 7472)</legend>' +
+      '<div class="row2"><label>Precio de la oferta (₡)<input class="inp" name="precio" type="number" min="1"></label>' +
+      '<label>Cantidad disponible<input class="inp" name="cantidad" type="number" min="1"></label></div>' +
+      '<label>Restricciones<input class="inp" name="restricciones" placeholder="Ej.: válido en tienda y en línea"></label>' +
+      '<label class="chk"><input type="checkbox" name="stock"> Existencias verificadas con bodega</label>' +
+      "</fieldset>" +
+      '<div class="errs" id="errs" hidden></div>' +
+      '<div class="actions"><button type="button" class="btn-ghost" data-act="close">Cancelar</button><button class="btn" type="submit">Crear campaña</button></div>' +
+      "</form>"
+    );
+  }
+
+  function leadForm() {
+    return (
+      '<form id="form-lead" novalidate>' +
+      '<h3 id="modal-title">Nuevo prospecto</h3>' +
+      '<label>Nombre<input class="inp" name="nombre" required></label>' +
+      '<label>Correo<input class="inp" name="correo" type="email" required></label>' +
+      '<div class="row2"><label>Campaña de origen<select class="inp" name="camp">' +
+      S.campanas.map(function (c) { return '<option value="' + c.id + '">' + esc(c.nombre) + "</option>"; }).join("") +
+      '</select></label><label>Puntaje (0-100)<input class="inp" name="puntaje" type="number" min="0" max="100" value="50"></label></div>' +
+      '<label class="chk"><input type="checkbox" name="consent"> El prospecto consintió el uso de sus datos para contacto comercial (Ley 8968)</label>' +
+      '<div class="errs" id="errs" hidden></div>' +
+      '<div class="actions"><button type="button" class="btn-ghost" data-act="close">Cancelar</button><button class="btn" type="submit">Guardar prospecto</button></div>' +
+      "</form>"
+    );
+  }
+
+  function showErrs(list) {
+    var box = $("#errs");
+    box.hidden = false;
+    box.innerHTML = "<strong>No se puede guardar todavía:</strong><ul>" + list.map(function (e) { return "<li>" + esc(e) + "</li>"; }).join("") + "</ul>";
+  }
+
+  /* ---------- Eventos ---------- */
+  var app = $("#app");
+  app.addEventListener("click", function (ev) {
+    var n = ev.target.closest("[data-nav]");
+    if (n) { S.view = n.getAttribute("data-nav"); S.confirm = null; render(); return; }
+    var b = ev.target.closest("[data-act]");
+    if (!b) return;
+    var act = b.getAttribute("data-act"), id = b.getAttribute("data-id");
+    if (act === "new-camp") { openModal(campForm()); return; }
+    if (act === "new-lead") { openModal(leadForm()); return; }
+    if (act === "toggle") {
+      var c = campById(id);
+      if (c.estado === "Activa") c.estado = "Pausada";
+      else if (c.estado === "Pausada") {
+        if (c.tipo === "Promoción" && !c.stock) { toast("No se puede reactivar sin existencias verificadas.", true); return; }
+        c.estado = "Activa";
+      }
+      toast("Campaña " + (c.estado === "Activa" ? "activa" : "pausada") + ": " + c.nombre);
+      render(); return;
+    }
+    if (act === "del") {
+      if (S.confirm !== "del-" + id) { S.confirm = "del-" + id; render(); setTimeout(function () { if (S.confirm === "del-" + id) { S.confirm = null; if (S.view === "campanas") render(); } }, 3000); return; }
+      S.campanas = S.campanas.filter(function (c) { return c.id !== id; });
+      S.leads = S.leads.filter(function (l) { return l.camp !== id; });
+      S.confirm = null; toast("Campaña eliminada."); render(); return;
+    }
+    if (act === "attend") {
+      var l = S.leads.filter(function (x) { return x.id === id; })[0];
+      l.estado = "Contactado"; toast("Prospecto marcado como atendido: " + l.nombre); render(); return;
+    }
+    if (act === "role") { rolSel = id; render(); return; }
+  });
+
+  app.addEventListener("input", function (ev) {
+    var t = ev.target;
+    if (t.id === "f-cq") { S.f.cq = t.value; $("#camp-table").innerHTML = campTableHtml(); }
+    if (t.id === "f-lq") { S.f.lq = t.value; $("#lead-table").innerHTML = leadTableHtml(); }
+  });
+
+  app.addEventListener("change", function (ev) {
+    var t = ev.target;
+    if (t.id === "f-ce") { S.f.ce = t.value; $("#camp-table").innerHTML = campTableHtml(); }
+    if (t.id === "f-le") { S.f.le = t.value; $("#lead-table").innerHTML = leadTableHtml(); }
+    if (t.getAttribute("data-change") === "stage") {
+      var l = S.leads.filter(function (x) { return x.id === t.getAttribute("data-id"); })[0];
+      l.estado = t.value; toast("Estado actualizado: " + l.nombre); render();
+    }
+  });
+
+  modalBack.addEventListener("click", function (ev) {
+    if (ev.target === modalBack || ev.target.closest('[data-act="close"]')) closeModal();
+  });
+  document.addEventListener("keydown", function (ev) { if (ev.key === "Escape" && !modalBack.hidden) closeModal(); });
+
+  modal.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var form = ev.target;
+    var d = Object.fromEntries(new FormData(form).entries());
+
+    if (form.id === "form-camp") {
+      var e = [];
+      if (!d.nombre || !d.nombre.trim()) e.push("Escriba el nombre de la campaña.");
+      if (!(Number(d.asignado) > 0)) e.push("El presupuesto asignado debe ser mayor que cero.");
+      if (!d.inicio || !d.fin) e.push("Indique la vigencia (fecha de inicio y de fin).");
+      else if (d.fin < d.inicio) e.push("La fecha de fin no puede ser anterior a la de inicio.");
+      if (d.tipo === "Promoción") {
+        if (!(Number(d.precio) > 0)) e.push("Las promociones requieren precio de la oferta.");
+        if (!(Number(d.cantidad) > 0)) e.push("Las promociones requieren cantidad disponible.");
+        if (!d.restricciones || !d.restricciones.trim()) e.push("Indique las restricciones de la promoción (puede ser \"Ninguna\").");
+        if (!d.stock) e.push("Confirme que las existencias fueron verificadas con bodega antes de publicar.");
+      }
+      if (e.length) { showErrs(e); return; }
+      var num = S.campanas.length + 1;
+      S.campanas.push({
+        id: "CMP-2026-" + String(num).padStart(3, "0"), nombre: d.nombre.trim(), canal: d.canal,
+        asignado: Number(d.asignado), ejecutado: 0, valor: 0, estado: "Activa", tipo: d.tipo,
+        inicio: d.inicio, fin: d.fin,
+        precio: Number(d.precio) || undefined, cantidad: Number(d.cantidad) || undefined,
+        restricciones: d.restricciones || undefined, stock: !!d.stock
+      });
+      closeModal(); S.view = "campanas"; S.f.ce = "Todos"; render();
+      toast("Campaña creada y validada.");
+      return;
+    }
+
+    if (form.id === "form-lead") {
+      var el = [];
+      if (!d.nombre || !d.nombre.trim()) el.push("Escriba el nombre del prospecto.");
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.correo || "")) el.push("Escriba un correo válido.");
+      if (!d.consent) el.push("Registre el consentimiento del prospecto antes de guardarlo (Ley 8968).");
+      if (el.length) { showErrs(el); return; }
+      S.leads.unshift({ id: "L-" + String(S.leads.length + 1).padStart(2, "0"), nombre: d.nombre.trim(), correo: d.correo, camp: d.camp, puntaje: Math.min(100, Math.max(0, Number(d.puntaje) || 0)), estado: "Nuevo", creado: Date.now(), consentimiento: true });
+      closeModal(); S.view = "crm"; render();
+      toast("Prospecto registrado. Recuerde atenderlo pronto.");
+    }
+  });
+
+  render();
+  setInterval(function () { if (S.view === "dashboard" || S.view === "crm") { renderTop(); } }, 30000);
+})();
+</script>
+</body>
+</html>
